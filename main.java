@@ -16,9 +16,9 @@ import java.util.*;
         String in = "filter add dev "+data.INTERFACE_DYNAMIC+" parent 1:0 protocol ip prio 1 u32 match ip dst";
         String out = "filter add dev "+data.INTERFACE_STATIC+" parent 1:0 protocol ip prio 1 u32 match ip src";
         String IP = isp+"0."+isp+"0."+isp+"0.1";
-            exe.shellCommands("/usr/sbin/tc qdisc del dev enp0s3 root");
-            exe.shellCommands("/usr/sbin/tc qdisc del dev enp0s3 ingress");
-            exe.shellCommands("/usr/sbin/tc qdisc del dev ifb0 root");
+            exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_DYNAMIC+" root");
+            exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_DYNAMIC+" ingress");
+            exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_STATIC+" root");
             exe.shellCommands("echo hola mundo");
             exe.shellCommands(up);
             exe.shellCommands("modprobe ifb numifbs=1");
@@ -51,7 +51,7 @@ import java.util.*;
 
 class Data {
 
-    public static String INTERFACE_DYNAMIC = "enp0s3";
+    public static String INTERFACE_DYNAMIC = "enp0s8";
     public static String INTERFACE_STATIC = "ifb0";
 
 
