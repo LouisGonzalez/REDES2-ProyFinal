@@ -11,7 +11,7 @@ import java.util.*;
         int isp = scan.nextInt();
         
         try{
-            exe.shellCommands("asd");
+            exe.shellCommands("echo hola mundo");
         } catch(IOException ioe){
             System.out.println(ioe);
         }
