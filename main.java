@@ -26,7 +26,7 @@ import java.util.*;
             exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_DYNAMIC+" root 2>/dev/null");
             exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_DYNAMIC+" ingress 2>/dev/null");
             exe.shellCommands("/usr/sbin/tc qdisc del dev "+data.INTERFACE_STATIC+" root 2>/dev/null");
-            exe.shellCommands("/usr/sbin/tc filter add dev "+data.INTERFACE_DYNAMIC+" handle ffff: ingress");
+            exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" handle ffff: ingress");
             exe.shellCommands("/usr/sbin/tc filter add dev "+data.INTERFACE_DYNAMIC+" parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev "+data.INTERFACE_STATIC);
             
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" root handle 1:htb default 10");
