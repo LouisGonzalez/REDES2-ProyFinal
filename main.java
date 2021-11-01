@@ -29,7 +29,7 @@ import java.util.*;
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" handle ffff: ingress");
             exe.shellCommands("/usr/sbin/tc filter add dev "+data.INTERFACE_DYNAMIC+" parent ffff: protocol ip u32 match u32 0 0 action mirred egress redirect dev "+data.INTERFACE_STATIC);
             
-            exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" root handle 1:htb default 10");
+            exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" root handle 1: htb default 10");
             exe.shellCommands("/usr/sbin/tc class add dev "+data.INTERFACE_DYNAMIC+" parent 1: classid 1:10 htb rate 1000kbit ceil 1000kbit");
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" parent 1:10 handle 10: sfq perturb 10");
 
