@@ -8,10 +8,27 @@ import java.util.*;
 
 	public static void main(String[] args){
         try{
-        System.out.println("Defina el ISP que va a modificar 1|2");
         Scanner scan = new Scanner(System.in);
+        System.out.println("1. ISP(1/2)\n"+
+                            "2. Balanceador");
+        int script = scan.nextInt();
+        if(script == 1){
+            configurationISP(scan);
+        } else {
+            confBalanceador(scan);
+        }
+
+
+        } catch(IOException ioe){
+            System.out.println(ioe);
+        }
+
+    }
+
+
+    public static void configurationISP(Scanner scan) throws IOException{
+        System.out.println("Defina el ISP que va a modificar 1|2");
         int isp = scan.nextInt();
-//        String up = "ip addr add "+isp+"0."+isp+"0."+isp+"0.1/24 dev "+data.INTERFACE_DYNAMIC;
         int ipInterfaz = isp+1;
         String up = "ip addr add 10.10."+ipInterfaz+".1/24 dev "+data.INTERFACE_DYNAMIC;
         String down = "ip addr add "+isp+"0."+isp+"0."+isp+"0.2/24 dev "+data.INTERFACE_STATIC;
@@ -36,16 +53,42 @@ import java.util.*;
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_DYNAMIC+" parent 1:10 handle 10: sfq perturb 10");
 
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_STATIC+" root handle 1: htb default 10");
-            exe.shellCommands("/usr/sbin/tc class add dev "+data.INTERFACE_STATIC+" parent 1: classid 1:10 htb rate 50kbit ceil 50kbit");
+            exe.shellCommands("/usr/sbin/tc class add dev "+data.INTERFACE_STATIC+" parent 1: classid 1:10 htb rate 500kbit ceil 500kbit");
             exe.shellCommands("/usr/sbin/tc qdisc add dev "+data.INTERFACE_STATIC+" parent 1:10 handle 10: sfq perturb 10");
 
             exe.shellCommands("/usr/sbin/tc "+in+" "+IP+" flowid 1:10");
             exe.shellCommands("/usr/sbin/tc "+out+" "+IP+" flowid 1:10");
 
+    }
 
-        } catch(IOException ioe){
-            System.out.println(ioe);
-        }
+    public static void confBalanceador(Scanner scan) throws IOException{
+        System.out.println("Porcentaje de paquetes:");
+        double paquete = scan.nextDouble();
+        //borrando iniciales
+        exe.shellCommands("iptables -t mangle -F");
+        exe.shellCommands("iptables -t nat -F");
+
+        //Inicializaciones
+        exe.shellCommands("ip route add 10.10.2.0/24 dev enp0s3 src 10.10.2.2 table isp1");
+        exe.shellCommands("ip route add 10.10.3.0/24 dev enp0s8 src 10.10.3.2 table isp2");
+        exe.shellCommands("ip route add default via 10.10.2.1 table isp1");
+        exe.shellCommands("ip route add default via 10.10.3.1 table isp2");
+        //alfinal hacer un ip route show table isp1/isp2
+        exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark");
+        exe.shellCommands("iptables -t mangle -A PREROUTING -m mark ! --mark 0 -j ACCEPT"); 
+        exe.shellCommands("iptables -t mangle -A PREROUTING -j MARK --set-mark 3");
+        exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability "+paquete+" -j MARK --set-mark 4");
+        exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --save-mark");
+        //alfinal hacer un iptables -t mangle -S
+        exe.shellCommands("iptables -t nat -A POSTROUTING -j MASQUERADE");
+        //alfinal hacer un iptables -t nat -S
+        exe.shellCommands("ip rule add fwmark 3 table isp1 prio 33000");
+        exe.shellCommands("ip rule add fwmark 4 table isp2 prio 33000");
+        //alfinal hacer un ip rule show
+        //si hay default en un ip route show borrarlas 
+
+
+
 
     }
 
