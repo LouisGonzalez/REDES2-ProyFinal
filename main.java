@@ -68,7 +68,11 @@ import java.util.*;
                             "3. AMBOS\n");
         int dist = scan.nextInt();
         double paquete = 0;
-        if(dist == 3){                   
+        if(dist == 1){
+            paquete = 0;
+        } else if(dist == 2){
+            paquete = 1;
+        } else if(dist == 3){                   
             System.out.println("Porcentaje de paquetes:");
             paquete = scan.nextDouble();
         }
@@ -85,13 +89,7 @@ import java.util.*;
         exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark");
         exe.shellCommands("iptables -t mangle -A PREROUTING -m mark ! --mark 0 -j ACCEPT"); 
         exe.shellCommands("iptables -t mangle -A PREROUTING -j MARK --set-mark 3");
-        if(dist == 1){
-            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability 0 -j MARK --set-mark 4");
-        } else if(dist == 2){
-            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability 0 -j MARK --set-mark 3");
-        } else if(dist == 3){
-            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability "+paquete+" -j MARK --set-mark 4");
-        }
+        exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability "+paquete+" -j MARK --set-mark 4");    
         exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --save-mark");
         //alfinal hacer un iptables -t mangle -S
         exe.shellCommands("iptables -t nat -A POSTROUTING -j MASQUERADE");
