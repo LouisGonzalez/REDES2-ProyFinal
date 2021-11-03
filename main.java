@@ -96,10 +96,10 @@ import java.util.*;
         //alfinal hacer un iptables -t mangle -S
         exe.shellCommands("iptables -t nat -A POSTROUTING -j MASQUERADE");
         //alfinal hacer un iptables -t nat -S
-        exe.shellCommands("ip rule add fwmark 3 table isp1 prio 33000");
         exe.shellCommands("ip rule add fwmark 4 table isp2 prio 33000");
+        exe.shellCommands("ip rule add fwmark 3 table isp1 prio 33000");
         //alfinal hacer un ip rule show
-        //si hay default en un ip route show borrarlas 
+        //si hay default en un ip route show borrarlas => ip route del default
 
 
 
