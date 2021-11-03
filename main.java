@@ -62,8 +62,16 @@ import java.util.*;
     }
 
     public static void confBalanceador(Scanner scan) throws IOException{
-        System.out.println("Porcentaje de paquetes:");
-        double paquete = scan.nextDouble();
+        System.out.println("A que interfaz quiere ser redirigido:\n"+
+                            "1. ISP1\n"+
+                            "2. ISP2\n"+
+                            "3. AMBOS\n");
+        int dist = scan.nextInt();
+        double paquete = 0;
+        if(dist == 3){                   
+            System.out.println("Porcentaje de paquetes:");
+            paquete = scan.nextDouble();
+        }
         //borrando iniciales
         exe.shellCommands("iptables -t mangle -F");
         exe.shellCommands("iptables -t nat -F");
@@ -77,7 +85,13 @@ import java.util.*;
         exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --restore-mark");
         exe.shellCommands("iptables -t mangle -A PREROUTING -m mark ! --mark 0 -j ACCEPT"); 
         exe.shellCommands("iptables -t mangle -A PREROUTING -j MARK --set-mark 3");
-        exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability "+paquete+" -j MARK --set-mark 4");
+        if(dist == 1){
+            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability 0 -j MARK --set-mark 4");
+        } else if(dist == 2){
+            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability 0 -j MARK --set-mark 3");
+        } else if(dist == 3){
+            exe.shellCommands("iptables -t mangle -A PREROUTING -m statistic --mode random --probability "+paquete+" -j MARK --set-mark 4");
+        }
         exe.shellCommands("iptables -t mangle -A PREROUTING -j CONNMARK --save-mark");
         //alfinal hacer un iptables -t mangle -S
         exe.shellCommands("iptables -t nat -A POSTROUTING -j MASQUERADE");
